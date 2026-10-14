@@ -1,10 +1,9 @@
 //define the maximun and the datatype
 #define N 128
-typedef int datatype;
 
 //define sqlist
 typedef struct{
-	datatype data[N];
+	int data[N];
 	int last;			//the index of the last data
 }sqlist, *sqlink;
 
