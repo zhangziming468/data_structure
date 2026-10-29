@@ -108,3 +108,103 @@ sqstack* sqstack_free(sqstack* s){
 
   return NULL;
 }
+
+int sqstack_full(sqstack* s){
+  if(s == NULL){
+    printf("The stack is NULL.\n");
+    return -1;
+  }
+
+  return (s->top == s->maxlen-1) ? 1 : 0;
+}
+
+queue* queue_create(int max){
+  queue* q;
+  if((q = (queue*)malloc(sizeof(queue))) == NULL){
+    printf("malloc failed.\n");
+    return NULL;
+  }
+
+  q->s1 = sqstack_create(max);
+  q->s2 = sqstack_create(max);
+
+  return q;
+}
+
+void enqueue(queue* q, data_t value){
+  if(q == NULL){
+    printf("q is NULL.\n");
+    return;
+  }
+
+  if(sqstack_full(q->s1) && !sqstack_empty(q->s2)){
+    printf("The queue is full.\n");
+    return;
+  }
+
+  if(sqstack_full(q->s1) && sqstack_empty(q->s2)){
+    while(!sqstack_empty(q->s1))
+      sqstack_push(q->s2, sqstack_pop(q->s1));
+  }
+
+  sqstack_push(q->s1, value);
+}
+
+data_t dequeue(queue* q){
+  if(q == NULL){
+    printf("q is NULL.\n");
+    return -1;
+  }
+
+  if(sqstack_empty(q->s1) && sqstack_empty(q->s2)){
+    printf("The queue is empty.\n");
+    return -1;
+  }
+
+  if(sqstack_empty(q->s2)){
+    while(!sqstack_empty(q->s1))
+      sqstack_push(q->s2,sqstack_pop(q->s1));
+  }
+
+  return sqstack_pop(q->s2);
+}
+
+int queue_empty(queue* q){
+  if(q == NULL){
+    printf("p is NULL.\n");
+    return -1;
+  }
+
+  return (sqstack_empty(q->s1) && sqstack_empty(q->s2)) ? 1 : 0;
+}
+
+data_t queue_front(queue* q){
+  if(q == NULL){
+    printf("q is NULL");
+    return -1;
+  }
+
+  if(queue_empty(q)){
+    printf("q is empty.\n");
+    return -1;
+  }
+
+  if(sqstack_empty(q->s2)){
+    while(!sqstack_empty(q->s1))
+      sqstack_push(q->s2, sqstack_pop(q->s1));
+  }
+
+  return sqstack_top(q->s2);
+}
+
+queue* queue_free(queue* q){
+  if(q == NULL)
+    return NULL;
+
+  q->s1 = sqstack_free(q->s1);
+  q->s2 = sqstack_free(q->s2);
+
+  free(q);
+  
+  return NULL;
+}
